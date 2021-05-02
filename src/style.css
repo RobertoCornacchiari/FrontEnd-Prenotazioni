@@ -4,6 +4,7 @@
 }
 body {
   background-color: aquamarine;
+  padding-top: 80px;
 }
 header {
   background-color: white;
@@ -12,6 +13,7 @@ header {
   left: 0;
   width: 100%;
   margin-bottom: 10px;
+  padding-bottom: 8px;
 }
 footer {
   background-color: #4C4E4D;
@@ -26,6 +28,28 @@ footer {
 .corpo {
   text-align: center;
   display: flex;
-  margin: 40px;
   align-items: center;
+}
+.titolo {
+  font-size: 30px;
+}
+.logIn {
+  position: fixed;
+  top: 8;
+  right: 8;
+}
+.card {
+  max-width: 400px;
+  margin: 10px auto;
+}
+.form {
+  background-color: whitesmoke;
+  width: 600px;
+  margin: auto;
+  padding: 20px;
+  text-align: center;
+  border-radius: 8px;
+}
+.form-label {
+  font-size: 20px;
 }
