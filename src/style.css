@@ -1,4 +1,31 @@
 .app {
     font-family: sans-serif;
     align-content: center;
-  }
+}
+body {
+  background-color: aquamarine;
+}
+header {
+  background-color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  margin-bottom: 10px;
+}
+footer {
+  background-color: #4C4E4D;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+.pagina {
+  
+}
+.corpo {
+  text-align: center;
+  display: flex;
+  margin: 40px;
+  align-items: center;
+}
