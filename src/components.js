@@ -128,7 +128,7 @@ export function Prenota(params) {
                   <Giorni contesto={params.contesto}/>
               </select>
               <div id="CodiceFiscaleHelp" class="form-text">
-                Scegli il giorno in cui effettuare il tampone (presidi diversi hanno disponibilità diverse).
+                Scegli il giorno in cui effettuare il tampone (<b>presidi diversi hanno disponibilità diverse</b>).
               </div>
             </div>
             <button type="submit" class="btn btn-primary" disabled>
