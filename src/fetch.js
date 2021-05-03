@@ -14,3 +14,4 @@ function formatVariables(variables) {
     }
     return variablesString.substr(0, variablesString.length - 1);
 }
+
