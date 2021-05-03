@@ -123,7 +123,7 @@ export function Prenota() {
                 aria-describedby="GiorniHelp" disabled>
               </select>
               <div id="CodiceFiscaleHelp" class="form-text">
-                Scegli il giorno in cui effettuare il tampone (presidi diversi hanno disponibilità diverse).
+                Scegli il giorno in cui effettuare il tampone (<b>presidi diversi hanno disponibilità diverse</b>).
               </div>
             </div>
             <button type="submit" class="btn btn-primary" disabled>
