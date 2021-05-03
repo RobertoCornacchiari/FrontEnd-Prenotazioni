@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useReducer, useContext, useEffect, useState } from "react";
 import "./style.css";
 import logo from '../img/Logo.jpeg';
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import * as fetch from './fetch.js';
 import { FormCheck } from "react-bootstrap";
 
 function Pagina(props) {
@@ -80,18 +81,20 @@ function Card(props) {
   );
 }
 
+function cercaGiorni(){
+  console.log("Ciao");
+}
+
 //Pagina per la prenotazione di un tampone (scelta di data e presidio)
-export function Prenota() {
-
-    //Inserire la fetch per i presidi
-
+export function Prenota(params) {
+  
   return (
     <Pagina
       body={
-        <div className="Form">
+        <div className="Form"> 
           <form>
             <div class="mb-3">
-              <label for="CodiceFiscale" class="form-label">
+              <label htmlFor="CodiceFiscale" class="form-label">
                 Codice Fiscale
               </label>
               <input
@@ -105,22 +108,24 @@ export function Prenota() {
               </div>
             </div>
             <div class="mb-3 Presidi">
-            <label for="Presidi" class="form-label">
+            <label htmlFor="Presidi" class="form-label">
                 Presidi Disponibili
               </label>
               <select class="form-select"  id="Presidi"
-                aria-describedby="PresidiHelp">
+                aria-describedby="PresidiHelp" onChange={() => cercaGiorni()}>
+                  <Presidi contesto={params.contesto}/>
               </select>
               <div id="CodiceFiscaleHelp" class="form-text">
                 Scegli il presidio in cui effettuare il tampone.
               </div>
             </div>
             <div class="mb-3 Giorni">
-            <label for="CodiceFiscale" class="form-label">
+            <label htmlFor="CodiceFiscale" class="form-label">
                 Giorni Disponibili
               </label>
               <select class="form-select"  id="Giorni"
-                aria-describedby="GiorniHelp" disabled>
+                aria-describedby="GiorniHelp" disabled={true}>
+                  <Giorni contesto={params.contesto}/>
               </select>
               <div id="CodiceFiscaleHelp" class="form-text">
                 Scegli il giorno in cui effettuare il tampone (presidi diversi hanno disponibilità diverse).
@@ -129,7 +134,7 @@ export function Prenota() {
             <button type="submit" class="btn btn-primary" disabled>
               Submit
             </button>
-            <Link to="/"><button class="btn btn-primary" style={{"margin-left": "5px"}}>
+            <Link to="/"><button class="btn btn-primary" style={{"marginLeft": "5px"}}>
               Torna alla Home
             </button></Link>
           </form>
@@ -139,13 +144,49 @@ export function Prenota() {
   );
 }
 
+function Presidi(params) {
+  let Selettore = [];
+  const { state, dispatch } = useContext(params.contesto);
+  let presidi = state.presidi;
+  presidi.forEach((element, i) => {
+    Selettore[Selettore.length] = (
+      <option value={element} key={i}>{element}</option>
+    )
+  });
+
+  return (
+    <>
+      {Selettore}
+    </>
+  )
+}
+
+function Giorni(params) {
+  let giorni = [];
+  const { state, dispatch } = useContext(params.contesto);
+  let date = state.giorniDisponibili;
+  date.forEach((element, i) => {
+    giorni[giorni.length] = (
+      <option value={element}>{element}</option>
+    )
+  });
+
+  return (
+    <>
+      {giorni}
+    </>
+  )
+}
+
+
+
 export function Controlla() {
   return (
     <Pagina body={
         <div className="Form">
       <form>
         <div class="mb-3">
-          <label for="CodiceFiscale" class="form-label">
+          <label htmlFor="CodiceFiscale" class="form-label">
             Codice Prenotazione
           </label>
           <input
@@ -157,7 +198,7 @@ export function Controlla() {
         <button type="submit" class="btn btn-primary">
           Controlla
         </button>
-        <Link to="/"><button class="btn btn-primary" style={{"margin-left": "5px"}}>
+        <Link to="/"><button class="btn btn-primary" style={{"marginLeft": "5px"}}>
           Torna alla Home
         </button></Link>
       </form>
@@ -171,7 +212,7 @@ export function Esito() {
             <div className="Form">
           <form>
             <div class="mb-3">
-              <label for="CodiceFiscale" class="form-label">
+              <label htmlFor="CodiceFiscale" class="form-label">
                 Codice Prenotazione
               </label>
               <input
@@ -183,7 +224,7 @@ export function Esito() {
             <button type="submit" class="btn btn-primary">
               Visualizza l'esito
             </button>
-            <Link to="/"><button class="btn btn-primary" style={{"margin-left": "5px"}}>
+            <Link to="/"><button class="btn btn-primary" style={{"marginLeft": "5px"}}>
               Torna alla Home
             </button></Link>
           </form>
@@ -200,7 +241,7 @@ export function LogIn() {
             <div className="Form">
           <form>
             <div class="mb-3">
-              <label for="CodiceFiscale" class="form-label">
+              <label htmlFor="CodiceFiscale" class="form-label">
                 Nome Utente
               </label>
               <input
@@ -210,7 +251,7 @@ export function LogIn() {
               ></input>
             </div>
             <div class="mb-3">
-              <label for="CodiceFiscale" class="form-label">
+              <label htmlFor="CodiceFiscale" class="form-label">
                 Password
               </label>
               <input
@@ -222,7 +263,7 @@ export function LogIn() {
             <button type="submit" class="btn btn-primary">
               Accedi
             </button>
-            <Link to="/"><button class="btn btn-primary" style={{"margin-left": "5px"}}>
+            <Link to="/"><button class="btn btn-primary" style={{"margiLeft": "5px"}}>
               Torna alla Home
             </button></Link>
           </form>
