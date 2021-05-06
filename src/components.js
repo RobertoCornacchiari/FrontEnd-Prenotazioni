@@ -12,7 +12,7 @@ function Pagina(props) {
         <div class="container">
           <div class="row">
             <div class="col Titolo">
-                <Logo/>
+              <Logo />
                 Applicazione tamponi
             </div>
             <div class="col">
@@ -81,17 +81,27 @@ function Card(props) {
   );
 }
 
-function cercaGiorni(){
+function cercaGiorni(params) {
+  const { state, dispatch } = useReducer(params.contesto);
+  dispatch({
+    type: "cercaGiorni", payload: () => {
+      let e = document.getElementById("Presidi");
+      let valore = e.options[e.selectedIndex].value;
+      console.log(valore);
+      return valore;
+    }
+  })
   console.log("Ciao");
 }
 
 //Pagina per la prenotazione di un tampone (scelta di data e presidio)
 export function Prenota(params) {
-  
+  const { state, dispatch } = useReducer(params.contesto);
+
   return (
     <Pagina
       body={
-        <div className="Form"> 
+        <div className="Form">
           <form>
             <div class="mb-3">
               <label htmlFor="CodiceFiscale" class="form-label">
@@ -108,24 +118,21 @@ export function Prenota(params) {
               </div>
             </div>
             <div class="mb-3 Presidi">
-            <label htmlFor="Presidi" class="form-label">
+              <label htmlFor="Presidi" class="form-label">
                 Presidi Disponibili
               </label>
-              <select class="form-select"  id="Presidi"
-                aria-describedby="PresidiHelp" onChange={() => cercaGiorni()}>
-                  <Presidi contesto={params.contesto}/>
-              </select>
+              <SelettorePresidi contesto={params.contesto} />
               <div id="CodiceFiscaleHelp" class="form-text">
                 Scegli il presidio in cui effettuare il tampone.
               </div>
             </div>
             <div class="mb-3 Giorni">
-            <label htmlFor="CodiceFiscale" class="form-label">
+              <label htmlFor="CodiceFiscale" class="form-label">
                 Giorni Disponibili
               </label>
-              <select class="form-select"  id="Giorni"
+              <select class="form-select" id="Giorni"
                 aria-describedby="GiorniHelp" disabled={true}>
-                  <Giorni contesto={params.contesto}/>
+                <Giorni contesto={params.contesto} />
               </select>
               <div id="CodiceFiscaleHelp" class="form-text">
                 Scegli il giorno in cui effettuare il tampone (<b>presidi diversi hanno disponibilità diverse</b>).
@@ -134,7 +141,7 @@ export function Prenota(params) {
             <button type="submit" class="btn btn-primary" disabled>
               Submit
             </button>
-            <Link to="/"><button class="btn btn-primary" style={{"marginLeft": "5px"}}>
+            <Link to="/"><button class="btn btn-primary" style={{ "marginLeft": "5px" }}>
               Torna alla Home
             </button></Link>
           </form>
@@ -144,13 +151,46 @@ export function Prenota(params) {
   );
 }
 
+function SelettorePresidi(params) {
+  const { state, dispatch } = useContext(params.contesto);
+
+  return (
+    <select class="form-select" id="Presidi"
+      aria-describedby="PresidiHelp" onClick={() => {
+        dispatch({
+          type: "cercaGiorni", payload: () => {
+            let e = document.getElementById("Presidi");
+            let valore = e.options[e.selectedIndex].value;
+            console.log(valore);
+            return valore;
+          }
+        })
+      }}>
+      <Presidi contesto={params.contesto} />
+    </select>
+  )
+}
+
+function reducer(state, action) {
+  let newState = { ...state };
+  switch (action.type) {
+    case "cercaGiorni":
+      console.log("state");
+      break;
+    default:
+      break;
+  }
+  console.log("stato", newState);
+  return newState;
+}
+
 function Presidi(params) {
   let Selettore = [];
   const { state, dispatch } = useContext(params.contesto);
   let presidi = state.presidi;
   presidi.forEach((element, i) => {
     Selettore[Selettore.length] = (
-      <option value={element} key={i}>{element}</option>
+      <option value={element} key={i} onClick={() => cercaGiorni(params.contesto)}>{element}</option>
     )
   });
 
@@ -183,97 +223,97 @@ function Giorni(params) {
 export function Controlla() {
   return (
     <Pagina body={
-        <div className="Form">
-      <form>
-        <div class="mb-3">
-          <label htmlFor="CodiceFiscale" class="form-label">
-            Codice Prenotazione
+      <div className="Form">
+        <form>
+          <div class="mb-3">
+            <label htmlFor="CodiceFiscale" class="form-label">
+              Codice Prenotazione
           </label>
-          <input
-            type="text"
-            class="form-control"
-            id="CodicePrenotazione"
-          ></input>
-        </div>
-        <button type="submit" class="btn btn-primary">
-          Controlla
+            <input
+              type="text"
+              class="form-control"
+              id="CodicePrenotazione"
+            ></input>
+          </div>
+          <button type="submit" class="btn btn-primary">
+            Controlla
         </button>
-        <Link to="/"><button class="btn btn-primary" style={{"marginLeft": "5px"}}>
-          Torna alla Home
+          <Link to="/"><button class="btn btn-primary" style={{ "marginLeft": "5px" }}>
+            Torna alla Home
         </button></Link>
-      </form>
-    </div>
-    }/>
+        </form>
+      </div>
+    } />
   );
 }
 export function Esito() {
-    return (
-        <Pagina body={
-            <div className="Form">
-          <form>
-            <div class="mb-3">
-              <label htmlFor="CodiceFiscale" class="form-label">
-                Codice Prenotazione
+  return (
+    <Pagina body={
+      <div className="Form">
+        <form>
+          <div class="mb-3">
+            <label htmlFor="CodiceFiscale" class="form-label">
+              Codice Prenotazione
               </label>
-              <input
-                type="text"
-                class="form-control"
-                id="CodicePrenotazione"
-              ></input>
-            </div>
-            <button type="submit" class="btn btn-primary">
-              Visualizza l'esito
+            <input
+              type="text"
+              class="form-control"
+              id="CodicePrenotazione"
+            ></input>
+          </div>
+          <button type="submit" class="btn btn-primary">
+            Visualizza l'esito
             </button>
-            <Link to="/"><button class="btn btn-primary" style={{"marginLeft": "5px"}}>
-              Torna alla Home
+          <Link to="/"><button class="btn btn-primary" style={{ "marginLeft": "5px" }}>
+            Torna alla Home
             </button></Link>
-          </form>
-        </div>
-        }/>
-      );
+        </form>
+      </div>
+    } />
+  );
 }
 export function AreaRiservata() {
   return <div className="pagina"></div>;
 }
 export function LogIn() {
-    return (
-        <Pagina body={
-            <div className="Form">
-          <form>
-            <div class="mb-3">
-              <label htmlFor="CodiceFiscale" class="form-label">
-                Nome Utente
+  return (
+    <Pagina body={
+      <div className="Form">
+        <form>
+          <div class="mb-3">
+            <label htmlFor="CodiceFiscale" class="form-label">
+              Nome Utente
               </label>
-              <input
-                type="text"
-                class="form-control"
-                id="NomeUtente"
-              ></input>
-            </div>
-            <div class="mb-3">
-              <label htmlFor="CodiceFiscale" class="form-label">
-                Password
+            <input
+              type="text"
+              class="form-control"
+              id="NomeUtente"
+            ></input>
+          </div>
+          <div class="mb-3">
+            <label htmlFor="CodiceFiscale" class="form-label">
+              Password
               </label>
-              <input
-                type="password"
-                class="form-control"
-                id="Password"
-              ></input>
-            </div>
-            <button type="submit" class="btn btn-primary">
-              Accedi
+            <input
+              type="password"
+              class="form-control"
+              id="Password"
+            ></input>
+          </div>
+          <button type="submit" class="btn btn-primary">
+            Accedi
             </button>
-            <Link to="/"><button class="btn btn-primary" style={{"margiLeft": "5px"}}>
-              Torna alla Home
+          <Link to="/"><button class="btn btn-primary" style={{ "margiLeft": "5px" }}>
+            Torna alla Home
             </button></Link>
-          </form>
-        </div>
-        }/>
-    )
+        </form>
+      </div>
+    } />
+  )
 }
 
 function Logo(props) {
-    return (
-        <img src={logo} style={{width: 120, height: 40}}/>
-    );
+  return (
+    <img src={logo} style={{ width: 120, height: 40 }} />
+  );
 }

@@ -1,7 +1,8 @@
 export async function GETData(phpScriptName, variables) {
-    let data = await fetch('http://localhost:63342/prenotazioni/' + phpScriptName + "?" + formatVariables(variables),
+    let data = await fetch('http://localhost/prenotazioni/' + phpScriptName + "?" + formatVariables(variables),
         {
             method: "GET",
+            mode:"no-cors",
         })
         .then(r => r.json());
     return data;

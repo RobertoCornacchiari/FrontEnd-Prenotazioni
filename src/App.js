@@ -9,6 +9,7 @@ import {
   AreaRiservata,
   LogIn,
 } from "./components.js";
+import * as fetch from './fetch.js';
 
 const AppContext = React.createContext(null);
 
@@ -49,7 +50,9 @@ export function App() {
 function reducer(state, action) {
 	let newState = { ...state };
   switch (action.type) {
-    case "":
+    case "cercaGiorni":
+      let presidio = action.payload();
+      fetch.GETData('prenotazioni.php', {}).then(r => console.log(r))
       break;
     default:
       break;
