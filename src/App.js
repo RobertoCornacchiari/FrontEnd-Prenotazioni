@@ -15,10 +15,10 @@ const AppContext = React.createContext(null);
 
 export function App() {
   const [state, dispatch] = useReducer(reducer, {
-    presidi: ['gianni', 'martio'],
+    presidi: ['Brescia Fiere', 'Centro Congressi'],
     giorniDisponibili: new Array(),
   });
-
+  
   return (
     <AppContext.Provider value={{ state, dispatch }}>
       <Router>
@@ -52,7 +52,25 @@ function reducer(state, action) {
   switch (action.type) {
     case "cercaGiorni":
       let presidio = action.payload();
-      fetch.GETData('prenotazioni.php', {}).then(r => console.log(r))
+      fetch.GETData('GiorniPresidio.php', {"presidio": presidio}).then(r => {
+        let a = new Array();
+        for (let i in r)
+          a.push(r[i].data);
+        newState.giorniDisponibili = a;
+        document.getElementById("Giorni").disabled = false;
+        document.getElementById("submitPrenota").disabled = false;
+      });
+      break;
+    case "Carica presidi":
+      newState.presidi = action.payload;
+      /*
+      fetch.GETData('Presidi.php', {}).then(r => {
+        let a = new Array();
+        for (let i in r)
+          a.push(r[i].nome);
+        newState.presidi = a;
+      });
+      */
       break;
     default:
       break;
