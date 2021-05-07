@@ -1,4 +1,9 @@
-export async function GETData(phpScriptName, variables) {
+module.exports = {
+    GETData,
+    postData
+}
+
+async function GETData(phpScriptName, variables) {
     let url = 'http://localhost/prenotazioni/' + phpScriptName + "?" + formatVariables(variables);
     console.log(url);
     let data = await fetch(url,
@@ -10,15 +15,19 @@ export async function GETData(phpScriptName, variables) {
     return data;
 }
 
-async function postData(url, data ) {
+async function postData(phpScriptName, data ) {
+    let url = 'http://localhost:63342/prenotazioni/' + phpScriptName;
+    console.log(url);
+    console.log(JSON.stringify(data));
     const response = await fetch(url, {
-        method: 'POST',
-        mode: 'cors',
+        method: "POST",
+        mode: "cors",
         headers: {
             'Content-Type': 'application/json'
             // 'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: JSON.stringify(data)
+        
     });
     return response.json();
 }

@@ -8,7 +8,8 @@ import {
   Link,
   useParams,
 } from "react-router-dom";
-import * as fetch from "./fetch.js";
+
+const {GETData, postData} = require('./fetch.js');
 
 let bool = 0;
 
@@ -38,10 +39,10 @@ function Pagina(props) {
 
 export function HomePage(params) {
   const { state, dispatch } = useContext(params.contesto);
-  function carica () {
+  function carica() {
     if (bool == 0) {
       bool = 1;
-      fetch.GETData("Presidi.php", {}).then((r) => {
+      GETData("Presidi.php", {}).then((r) => {
         let a = new Array();
         for (let i in r) a.push(r[i].nome);
         let elencoPresidi = a;
@@ -49,7 +50,7 @@ export function HomePage(params) {
         dispatch({ type: "Carica presidi", payload: elencoPresidi });
       });
     }
-  };
+  }
   carica();
   return (
     <Pagina
@@ -57,7 +58,7 @@ export function HomePage(params) {
         <div className="corpo">
           <div class="container">
             <div class="row row-cols-3">
-              <div class="col-xl-4 col-sm-12">
+              <div class="col-lg-4 col-sm-12 col-12">
                 <Card
                   nome="prenota"
                   titolo="Prenota"
@@ -65,7 +66,7 @@ export function HomePage(params) {
                   contesto={params.contesto}
                 />
               </div>
-              <div class="col-xl-4 col-sm-12">
+              <div class="col-lg-4 col-sm-12 col-12">
                 <Card
                   nome="controlla"
                   titolo="Controlla"
@@ -73,7 +74,7 @@ export function HomePage(params) {
                   contesto={params.contesto}
                 />
               </div>
-              <div class="col-xl-4 col-sm-12">
+              <div class="col-lg-4 col-sm-12 col-12">
                 <Card
                   nome="esito"
                   titolo="Esito"
@@ -89,16 +90,6 @@ export function HomePage(params) {
     />
   );
 }
-
-/*
-fetch.GETData("Presidi.php", {}).then((r) => {
-      let a = new Array();
-      for (let i in r) a.push(r[i].nome);
-      let elencoPresidi = a;
-      console.log(elencoPresidi);
-      dispatch({ type: "Carica presidi", payload: elencoPresidi });
-
-*/
 
 function Card(params) {
   const { state, dispatch } = useContext(params.contesto);
@@ -166,10 +157,22 @@ export function Prenota(params) {
               </div>
             </div>
             <button
-              type="submit"
+              type="button"
               class="btn btn-primary"
               id="submitPrenota"
-              disabled
+              onClick={() => {
+                console.log("Ciao");
+                let e = document.getElementById("Presidi");
+                let valorePresidio = e.options[e.selectedIndex].value;
+                e = document.getElementById("Giorno");
+                let valoreGiorno = e.options[e.selectedIndex].value;
+                postData("prenota.php", {
+                  codice: document.getElementById("CodiceFiscale").innerHTML,
+                  presidio: valorePresidio,
+                  giorno: valoreGiorno,
+                }).then(r => console.log(r))
+              }}
+              
             >
               Submit
             </button>
