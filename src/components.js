@@ -125,6 +125,7 @@ export function Prenota(params) {
                 class="form-control"
                 id="CodiceFiscale"
                 aria-describedby="CodiceFiscaleHelp"
+                required
               ></input>
               <div id="CodiceFiscaleHelp" class="form-text">
                 Inserisci il tuo codice fiscale (lettere maiuscole).
@@ -147,7 +148,7 @@ export function Prenota(params) {
                 class="form-select"
                 id="Giorni"
                 aria-describedby="GiorniHelp"
-                disabled={true}
+                required
               >
                 <Giorni contesto={params.contesto} />
               </select>
@@ -161,10 +162,9 @@ export function Prenota(params) {
               class="btn btn-primary"
               id="submitPrenota"
               onClick={() => {
-                console.log("Ciao");
                 let e = document.getElementById("Presidi");
                 let valorePresidio = e.options[e.selectedIndex].value;
-                e = document.getElementById("Giorno");
+                e = document.getElementById("Giorni");
                 let valoreGiorno = e.options[e.selectedIndex].value;
                 postData("prenota.php", {
                   codice: document.getElementById("CodiceFiscale").innerHTML,
@@ -196,6 +196,7 @@ function SelettorePresidi(params) {
       class="form-select"
       id="Presidi"
       aria-describedby="PresidiHelp"
+      required
       onClick={() => {
         dispatch({
           type: "cercaGiorni",

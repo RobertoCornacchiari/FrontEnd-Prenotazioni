@@ -57,8 +57,7 @@ function reducer(state, action) {
         for (let i in r)
           a.push(r[i].data);
         newState.giorniDisponibili = a;
-        document.getElementById("Giorni").disabled = false;
-        document.getElementById("submitPrenota").disabled = false;
+        
       });
       break;
     case "Carica presidi":
