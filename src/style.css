@@ -6,15 +6,6 @@ body {
   background-color: #437de9;
   padding-top: 80px;
 }
-header {
-  background-color: white;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  margin-bottom: 10px;
-  padding-bottom: 8px;
-}
 footer {
   background-color: #4C4E4D;
   position: fixed;
@@ -32,6 +23,9 @@ footer {
 }
 .titolo {
   font-size: 30px;
+  font-weight: bold;
+  margin: auto;
+  text-align: left;
 }
 .logIn {
   position: fixed;
@@ -52,4 +46,22 @@ footer {
 }
 .form-label {
   font-size: 20px;
+}
+.immagineCard {
+  display: block;
+  width: 100%;
+}
+.card-text {
+  font-size: 20px;
+}
+.card-header {
+  font-size: 30px;
+}
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 5px;
+  display: block;
 }

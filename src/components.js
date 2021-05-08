@@ -1,6 +1,6 @@
 import React, { useReducer, useContext, useEffect, useState } from "react";
 import "./style.css";
-import logo from "../img/Logo.jpeg";
+import assets from "../img/*.png";
 import {
   BrowserRouter as Router,
   Switch,
@@ -12,28 +12,42 @@ import {
   useLocation,
 } from "react-router-dom";
 
-const {GETData, postData} = require('./fetch.js');
+const { GETData, postData } = require('./fetch.js');
 
 let bool = 0;
 
 function Pagina(props) {
   return (
     <div className="Pagina">
-      <header>
-        <div class="container">
-          <div class="row">
-            <div class="col Titolo">
+
+      <nav class="navbar sticky-top navbar-light bg-light">
+        <img src={assets.Logo} width="160" height="30" class="d-inline-block align-top" alt="" />
+        <div className="Titolo">
+          PRENOTAZIONE TAMPONI
+        </div>
+        <form class="form-inline my-2 my-lg-0">
+        <Link to="/LogIn"><button class="btn btn-primary my-2 my-sm-0">Accedi</button></Link>
+        </form>
+      </nav>
+      {/*
+        <div className="container">
+          <div className="row">
+            <div className="col">
               <Logo />
-              Applicazione tamponi
             </div>
-            <div class="col">
+
+            <div className="col Titolo">
+
+              PRENOTAZIONE TAMPONI
+            </div>
+            <div className="col">
               <Link to="/LogIn">
                 <button className="btn btn-primary LogIn">Accedi</button>
               </Link>
             </div>
           </div>
         </div>
-      </header>
+        */}
       {props.body}
       <footer>Footer</footer>
     </div>
@@ -59,30 +73,33 @@ export function HomePage(params) {
     <Pagina
       body={
         <div className="corpo">
-          <div class="container">
-            <div class="row row-cols-3">
-              <div class="col-lg-4 col-sm-12 col-12">
+          <div className="container">
+            <div className="row row-cols-3">
+              <div className="col-lg-4 col-sm-12 col-12">
                 <Card
                   nome="prenota"
                   titolo="Prenota"
                   testo="Esegui la tua prenotazione"
                   contesto={params.contesto}
+                  immagine={assets.prenota}
                 />
               </div>
-              <div class="col-lg-4 col-sm-12 col-12">
+              <div className="col-lg-4 col-sm-12 col-12">
                 <Card
                   nome="controlla"
                   titolo="Controlla"
                   testo="Controlla, annulla o stampa la tua prenotazione"
                   contesto={params.contesto}
+                  immagine={assets.controlla}
                 />
               </div>
-              <div class="col-lg-4 col-sm-12 col-12">
+              <div className="col-lg-4 col-sm-12 col-12">
                 <Card
                   nome="esito"
                   titolo="Esito"
                   testo="Controlla l'esito del tampone"
                   contesto={params.contesto}
+                  immagine={assets.esito}
                 />
               </div>
             </div>
@@ -98,12 +115,13 @@ function Card(params) {
   const { state, dispatch } = useContext(params.contesto);
   let link = "/" + params.nome;
   return (
-    <div class="card">
-      <h5 class="card-header">{params.titolo}</h5>
-      <div class="card-body">
-        <p class="card-text">{params.testo}</p>
+    <div className="card">
+      <h5 className="card-header">{params.titolo}</h5>
+      <div className="card-body">
+        <Link to={link}><Image immagine={params.immagine} /></Link>
+        <p className="card-text">{params.testo}</p>
         <Link to={link}>
-          <a class="btn btn-primary">{params.titolo}</a>
+          <button className="btn btn-primary" style={{ "font-size": "20px" }}>{params.titolo}</button>
         </Link>
       </div>
     </div>
@@ -121,50 +139,50 @@ export function Prenota(params) {
       body={
         <div className="Form">
           <form>
-            <div class="mb-3">
-              <label htmlFor="CodiceFiscale" class="form-label">
+            <div className="mb-3">
+              <label htmlFor="CodiceFiscale" className="form-label">
                 Codice Fiscale
               </label>
               <input
                 type="text"
-                class="form-control"
+                className="form-control"
                 id="CodiceFiscale"
                 aria-describedby="CodiceFiscaleHelp"
                 required
               ></input>
-              <div id="CodiceFiscaleHelp" class="form-text">
+              <div id="CodiceFiscaleHelp" className="form-text">
                 Inserisci il tuo codice fiscale (lettere maiuscole).
               </div>
             </div>
-            <div class="mb-3 Presidi">
-              <label htmlFor="Presidi" class="form-label">
+            <div className="mb-3 Presidi">
+              <label htmlFor="Presidi" className="form-label">
                 Presidi Disponibili
               </label>
               <SelettorePresidi contesto={params.contesto} />
-              <div id="CodiceFiscaleHelp" class="form-text">
+              <div id="CodiceFiscaleHelp" className="form-text">
                 Scegli il presidio in cui effettuare il tampone.
               </div>
             </div>
-            <div class="mb-3 Giorni">
-              <label htmlFor="CodiceFiscale" class="form-label">
+            <div className="mb-3 Giorni">
+              <label htmlFor="CodiceFiscale" className="form-label">
                 Giorni Disponibili
               </label>
               <select
-                class="form-select"
+                className="form-select"
                 id="Giorni"
                 aria-describedby="GiorniHelp"
                 required
               >
                 <Giorni contesto={params.contesto} />
               </select>
-              <div id="CodiceFiscaleHelp" class="form-text">
+              <div id="CodiceFiscaleHelp" className="form-text">
                 Scegli il giorno in cui effettuare il tampone (
                 <b>presidi diversi hanno disponibilità diverse</b>).
               </div>
             </div>
             <button
               type="button"
-              class="btn btn-primary"
+              className="btn btn-primary"
               id="submitPrenota"
               onClick={() => {
                 let codiceFiscale = document.getElementById("CodiceFiscale").value;
@@ -187,16 +205,16 @@ export function Prenota(params) {
                   else {
                     codiceUnivoco = r;
                     history.push("/EsitoPrenotazione");
-                    
+
                   }
                 })
               }}
-              
+
             >
               Submit
             </button>
             <Link to="/">
-              <button class="btn btn-primary" style={{ marginLeft: "5px" }}>
+              <button className="btn btn-primary" style={{ marginLeft: "5px" }}>
                 Torna alla Home
               </button>
             </Link>
@@ -212,13 +230,13 @@ function SelettorePresidi(params) {
 
   return (
     <select
-      class="form-select"
+      className="form-select"
       id="Presidi"
       aria-describedby="PresidiHelp"
       required
       onClick={() => {
         cercaGiorni(dispatch);
-        
+
       }}
     >
       <Presidi contesto={params.contesto} />
@@ -230,21 +248,21 @@ function cercaGiorni(dispatch) {
   let e = document.getElementById("Presidi");
   let valore = e.options[e.selectedIndex].value;
 
-  GETData('GiorniPresidio.php', {"presidio": valore}).then(r => {
+  GETData('GiorniPresidio.php', { "presidio": valore }).then(r => {
     let a = new Array();
     for (let i in r)
       a.push(r[i].data);
-    dispatch({type: "caricaGiorni", payload: a});
+    dispatch({ type: "caricaGiorni", payload: a });
   });
 }
 
 export function EsitoPrenotazione(params) {
   return (
-    <Pagina body= {
+    <Pagina body={
       <div>
         Il tuo codice è {codiceUnivoco};
       </div>
-    }/>
+    } />
   )
 }
 
@@ -288,21 +306,21 @@ export function Controlla() {
       body={
         <div className="Form">
           <form>
-            <div class="mb-3">
-              <label htmlFor="CodiceFiscale" class="form-label">
+            <div className="mb-3">
+              <label htmlFor="CodiceFiscale" className="form-label">
                 Codice Prenotazione
               </label>
               <input
                 type="text"
-                class="form-control"
+                className="form-control"
                 id="CodicePrenotazione"
               ></input>
             </div>
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" className="btn btn-primary">
               Controlla
             </button>
             <Link to="/">
-              <button class="btn btn-primary" style={{ marginLeft: "5px" }}>
+              <button className="btn btn-primary" style={{ marginLeft: "5px" }}>
                 Torna alla Home
               </button>
             </Link>
@@ -318,21 +336,21 @@ export function Esito() {
       body={
         <div className="Form">
           <form>
-            <div class="mb-3">
-              <label htmlFor="CodiceFiscale" class="form-label">
+            <div className="mb-3">
+              <label htmlFor="CodiceFiscale" className="form-label">
                 Codice Prenotazione
               </label>
               <input
                 type="text"
-                class="form-control"
+                className="form-control"
                 id="CodicePrenotazione"
               ></input>
             </div>
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" className="btn btn-primary">
               Visualizza l'esito
             </button>
             <Link to="/">
-              <button class="btn btn-primary" style={{ marginLeft: "5px" }}>
+              <button className="btn btn-primary" style={{ marginLeft: "5px" }}>
                 Torna alla Home
               </button>
             </Link>
@@ -351,23 +369,23 @@ export function LogIn() {
       body={
         <div className="Form">
           <form>
-            <div class="mb-3">
-              <label htmlFor="CodiceFiscale" class="form-label">
+            <div className="mb-3">
+              <label htmlFor="CodiceFiscale" className="form-label">
                 Nome Utente
               </label>
-              <input type="text" class="form-control" id="NomeUtente"></input>
+              <input type="text" className="form-control" id="NomeUtente"></input>
             </div>
-            <div class="mb-3">
-              <label htmlFor="CodiceFiscale" class="form-label">
+            <div className="mb-3">
+              <label htmlFor="CodiceFiscale" className="form-label">
                 Password
               </label>
-              <input type="password" class="form-control" id="Password"></input>
+              <input type="password" className="form-control" id="Password"></input>
             </div>
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" className="btn btn-primary">
               Accedi
             </button>
             <Link to="/">
-              <button class="btn btn-primary" style={{ margiLeft: "5px" }}>
+              <button className="btn btn-primary" style={{ margiLeft: "5px" }}>
                 Torna alla Home
               </button>
             </Link>
@@ -378,6 +396,10 @@ export function LogIn() {
   );
 }
 
+function Image(props) {
+  return <img src={props.immagine} className="immagineCard" />;
+}
+
 function Logo(props) {
-  return <img src={logo} style={{ width: 120, height: 40 }} />;
+  return <img src={assets.Logo} style={{ width: 160, height: 35 }} />;
 }
