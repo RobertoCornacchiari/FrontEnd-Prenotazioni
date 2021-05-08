@@ -11,22 +11,29 @@ import {
   useHistory,
   useLocation,
 } from "react-router-dom";
+import { HomeButton } from "./utility";
+var QRCode = require("qrcode.react");
 
-const { GETData, postData } = require('./fetch.js');
+const { GETData, postData } = require("./fetch.js");
 
 let bool = 0;
 
 function Pagina(props) {
   return (
     <div className="Pagina">
-
       <nav class="navbar sticky-top navbar-light bg-light">
-        <img src={assets.Logo} width="160" height="30" class="d-inline-block align-top" alt="" />
-        <div className="Titolo">
-          PRENOTAZIONE TAMPONI
-        </div>
+        <img
+          src={assets.Logo}
+          width="160"
+          height="30"
+          class="d-inline-block align-top"
+          alt=""
+        />
+        <div className="Titolo">PRENOTAZIONE TAMPONI</div>
         <form class="form-inline my-2 my-lg-0">
-        <Link to="/LogIn"><button class="btn btn-primary my-2 my-sm-0">Accedi</button></Link>
+          <Link to="/LogIn">
+            <button class="btn btn-primary my-2 my-sm-0">Accedi</button>
+          </Link>
         </form>
       </nav>
       {/*
@@ -118,10 +125,14 @@ function Card(params) {
     <div className="card">
       <h5 className="card-header">{params.titolo}</h5>
       <div className="card-body">
-        <Link to={link}><Image immagine={params.immagine} /></Link>
+        <Link to={link}>
+          <Image immagine={params.immagine} />
+        </Link>
         <p className="card-text">{params.testo}</p>
         <Link to={link}>
-          <button className="btn btn-primary" style={{ "font-size": "20px" }}>{params.titolo}</button>
+          <button className="btn btn-primary" style={{ "font-size": "20px" }}>
+            {params.titolo}
+          </button>
         </Link>
       </div>
     </div>
@@ -129,6 +140,7 @@ function Card(params) {
 }
 
 let codiceUnivoco;
+let data;
 
 //Pagina per la prenotazione di un tampone (scelta di data e presidio)
 export function Prenota(params) {
@@ -185,7 +197,8 @@ export function Prenota(params) {
               className="btn btn-primary"
               id="submitPrenota"
               onClick={() => {
-                let codiceFiscale = document.getElementById("CodiceFiscale").value;
+                let codiceFiscale = document.getElementById("CodiceFiscale")
+                  .value;
                 console.log(codiceFiscale);
                 let e = document.getElementById("Presidi");
                 let valorePresidio = e.options[e.selectedIndex].value;
@@ -195,29 +208,27 @@ export function Prenota(params) {
                   codice: codiceFiscale,
                   presidio: valorePresidio,
                   giorno: valoreGiorno,
-                }).then(r => {
+                }).then((r) => {
                   document.getElementById("CodiceFiscale").value = "";
                   if (r == "Errore") {
                     console.log("Errore");
                     history.push("/prenota");
-                    alert("Errore nell'inserimento. Controllare di aver inserito correttamente tutti i parametri.");
-                  }
-                  else {
+                    alert(
+                      "Errore nell'inserimento. Controllare di aver inserito correttamente tutti i parametri."
+                    );
+                  } else {
                     codiceUnivoco = r;
+                    data = valoreGiorno;
+                    dispatch({ type: "aggiornaCodice", payload: r });
                     history.push("/EsitoPrenotazione");
-
                   }
-                })
+                });
               }}
-
             >
               Submit
             </button>
-            <Link to="/">
-              <button className="btn btn-primary" style={{ marginLeft: "5px" }}>
-                Torna alla Home
-              </button>
-            </Link>
+            <HomeButton style={{ "marginLeft": "5" }} />
+
           </form>
         </div>
       }
@@ -236,7 +247,6 @@ function SelettorePresidi(params) {
       required
       onClick={() => {
         cercaGiorni(dispatch);
-
       }}
     >
       <Presidi contesto={params.contesto} />
@@ -248,22 +258,32 @@ function cercaGiorni(dispatch) {
   let e = document.getElementById("Presidi");
   let valore = e.options[e.selectedIndex].value;
 
-  GETData('GiorniPresidio.php', { "presidio": valore }).then(r => {
+  GETData("GiorniPresidio.php", { presidio: valore }).then((r) => {
     let a = new Array();
-    for (let i in r)
-      a.push(r[i].data);
+    for (let i in r) a.push(r[i].data);
     dispatch({ type: "caricaGiorni", payload: a });
   });
 }
 
 export function EsitoPrenotazione(params) {
   return (
-    <Pagina body={
-      <div>
-        Il tuo codice è {codiceUnivoco};
-      </div>
-    } />
-  )
+    <Pagina
+      body={
+        <div className="corpo">
+          <div className="schedaEsito">
+            <h1>Resoconto prenotazione</h1>
+            <p style={{ "fontSize": "20" }}><b>Il tuo codice è <i style={{ "font-size": "25" }}>{codiceUnivoco}</i>.</b><br />
+              Dettalo all'operatore il giorno del tampone e conservalo per poter controllare lo state e il risultato del tampone.<br />
+              Puoi anche presentare il QRCode rappresentato per agevolare le procedure di autenticazione.<br/><br/>
+              Il tampone si effettuerà in data {data}</p>
+            <QRCode value={codiceUnivoco} size="300" />
+            <br />
+            <HomeButton style={{ "marginTop": "10" }} />
+          </div>
+        </div>
+      }
+    />
+  );
 }
 
 function Presidi(params) {
@@ -300,12 +320,29 @@ function Giorni(params) {
   return <>{giorni}</>;
 }
 
-export function Controlla() {
+export function Controlla(params) {
+  const { state, dispatch } = useContext(params.contesto);
+  const history = useHistory();
   return (
     <Pagina
       body={
         <div className="Form">
           <form>
+            <div className="mb-3">
+              <label htmlFor="CodiceFiscale" className="form-label">
+                Codice Fiscale
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="CodiceFiscale"
+                aria-describedby="CodiceFiscaleHelp"
+                required
+              ></input>
+              <div id="CodiceFiscaleHelp" className="form-text">
+                Inserisci il tuo codice fiscale (lettere maiuscole).
+              </div>
+            </div>
             <div className="mb-3">
               <label htmlFor="CodiceFiscale" className="form-label">
                 Codice Prenotazione
@@ -314,16 +351,38 @@ export function Controlla() {
                 type="text"
                 className="form-control"
                 id="CodicePrenotazione"
+                aria-describedby="CodiceHelp"
+                required
               ></input>
+              <div id="CodiceHelp" className="form-text">
+                Inserisci il codice della prenotazione da controllare.
+              </div>
             </div>
-            <button type="submit" className="btn btn-primary">
+            <button type="button" className="btn btn-primary" onClick={() => {
+              let codice = document.getElementById("CodicePrenotazione").value;
+              let codiceFiscale = document.getElementById("CodiceFiscale").value;
+              postData("cerca_prenotazione.php", { codice: codice, codiceFiscale: codiceFiscale }).then((r) => {
+                document.getElementById("CodicePrenotazione").value = "";
+                document.getElementById("CodiceFiscale").value = "";
+                if (r == "Errore") {
+                  console.log("Errore");
+                  history.push("/controlla");
+                  alert(
+                    "Errore nell'inserimento. Controllare di aver inserito correttamente tutti i parametri."
+                  );
+                } else {
+                  console.log(r);
+
+                  codiceUnivoco = r.codice;
+                  data = r.giorno;
+                  dispatch({ type: "aggiornaCodice", payload: r.codice });
+                  history.push("/EsitoPrenotazione");
+                }
+              });
+            }}>
               Controlla
             </button>
-            <Link to="/">
-              <button className="btn btn-primary" style={{ marginLeft: "5px" }}>
-                Torna alla Home
-              </button>
-            </Link>
+            <HomeButton style={{ "marginLeft": "5" }} />
           </form>
         </div>
       }
@@ -349,11 +408,7 @@ export function Esito() {
             <button type="submit" className="btn btn-primary">
               Visualizza l'esito
             </button>
-            <Link to="/">
-              <button className="btn btn-primary" style={{ marginLeft: "5px" }}>
-                Torna alla Home
-              </button>
-            </Link>
+            <HomeButton style={{ "marginLeft": "5" }} />
           </form>
         </div>
       }
@@ -373,22 +428,26 @@ export function LogIn() {
               <label htmlFor="CodiceFiscale" className="form-label">
                 Nome Utente
               </label>
-              <input type="text" className="form-control" id="NomeUtente"></input>
+              <input
+                type="text"
+                className="form-control"
+                id="NomeUtente"
+              ></input>
             </div>
             <div className="mb-3">
               <label htmlFor="CodiceFiscale" className="form-label">
                 Password
               </label>
-              <input type="password" className="form-control" id="Password"></input>
+              <input
+                type="password"
+                className="form-control"
+                id="Password"
+              ></input>
             </div>
             <button type="submit" className="btn btn-primary">
               Accedi
             </button>
-            <Link to="/">
-              <button className="btn btn-primary" style={{ margiLeft: "5px" }}>
-                Torna alla Home
-              </button>
-            </Link>
+            <HomeButton style={{ "marginLeft": "5" }} />
           </form>
         </div>
       }

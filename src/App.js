@@ -10,6 +10,7 @@ import {
   LogIn,
   EsitoPrenotazione,
 } from "./components.js";
+import PrivateRoute from "./PrivateRoute";
 const {GETData, postData} = require('./fetch.js');
 
 const AppContext = React.createContext(null);
@@ -18,31 +19,31 @@ export function App() {
   const [state, dispatch] = useReducer(reducer, {
     presidi: ['Brescia Fiere', 'Centro Congressi'],
     giorniDisponibili: new Array(),
+    codiceUnivoco: 0,
+
   });
   
   return (
     <AppContext.Provider value={{ state, dispatch }}>
       <Router>
         <Switch>
-          <Route path="/EsitoPrenotazione">
-            <EsitoPrenotazione contesto={AppContext}/>
-          </Route>
-          <Route path="/LogIn">
+          <PrivateRoute path="/EsitoPrenotazione" codice={state.codiceUnivoco} component={EsitoPrenotazione} contesto={AppContext}/>
+          <Route exact path="/LogIn">
             <LogIn contesto={AppContext}/>
           </Route>
-          <Route path="/prenota">
+          <Route exact path="/prenota">
             <Prenota contesto={AppContext}/>
           </Route>
-          <Route path="/controlla">
+          <Route exact path="/controlla">
             <Controlla contesto={AppContext}/>
           </Route>
-          <Route path="/esito">
+          <Route exact path="/esito">
             <Esito contesto={AppContext}/>
           </Route>
-          <Route path="/areaRiservata">
+          <Route exact path="/areaRiservata">
             <AreaRiservata contesto={AppContext}/>
           </Route>
-          <Route path="/">
+          <Route exact path="/">
             <HomePage contesto={AppContext}/>
           </Route>
         </Switch>
@@ -59,6 +60,9 @@ function reducer(state, action) {
       break;
     case "Carica presidi":
       newState.presidi = action.payload;
+      break;
+    case "aggiornaCodice":
+      newState.codiceUnivoco = action.payload;
       break;
     default:
       break;
