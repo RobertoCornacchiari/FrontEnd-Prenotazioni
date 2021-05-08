@@ -7,6 +7,9 @@ import {
   Route,
   Link,
   useParams,
+  Redirect,
+  useHistory,
+  useLocation,
 } from "react-router-dom";
 
 const {GETData, postData} = require('./fetch.js');
@@ -107,10 +110,12 @@ function Card(params) {
   );
 }
 
+let codiceUnivoco;
+
 //Pagina per la prenotazione di un tampone (scelta di data e presidio)
 export function Prenota(params) {
   const { state, dispatch } = useContext(params.contesto);
-
+  const history = useHistory();
   return (
     <Pagina
       body={
@@ -162,15 +167,29 @@ export function Prenota(params) {
               class="btn btn-primary"
               id="submitPrenota"
               onClick={() => {
+                let codiceFiscale = document.getElementById("CodiceFiscale").value;
+                console.log(codiceFiscale);
                 let e = document.getElementById("Presidi");
                 let valorePresidio = e.options[e.selectedIndex].value;
                 e = document.getElementById("Giorni");
                 let valoreGiorno = e.options[e.selectedIndex].value;
                 postData("prenota.php", {
-                  codice: document.getElementById("CodiceFiscale").innerHTML,
+                  codice: codiceFiscale,
                   presidio: valorePresidio,
                   giorno: valoreGiorno,
-                }).then(r => console.log(r))
+                }).then(r => {
+                  document.getElementById("CodiceFiscale").value = "";
+                  if (r == "Errore") {
+                    console.log("Errore");
+                    history.push("/prenota");
+                    alert("Errore nell'inserimento. Controllare di aver inserito correttamente tutti i parametri.");
+                  }
+                  else {
+                    codiceUnivoco = r;
+                    history.push("/EsitoPrenotazione");
+                    
+                  }
+                })
               }}
               
             >
@@ -198,14 +217,8 @@ function SelettorePresidi(params) {
       aria-describedby="PresidiHelp"
       required
       onClick={() => {
-        dispatch({
-          type: "cercaGiorni",
-          payload: () => {
-            let e = document.getElementById("Presidi");
-            let valore = e.options[e.selectedIndex].value;
-            return valore;
-          },
-        });
+        cercaGiorni(dispatch);
+        
       }}
     >
       <Presidi contesto={params.contesto} />
@@ -213,17 +226,26 @@ function SelettorePresidi(params) {
   );
 }
 
-function reducer(state, action) {
-  let newState = { ...state };
-  switch (action.type) {
-    case "cercaGiorni":
-      console.log("state");
-      break;
-    default:
-      break;
-  }
-  console.log("stato", newState);
-  return newState;
+function cercaGiorni(dispatch) {
+  let e = document.getElementById("Presidi");
+  let valore = e.options[e.selectedIndex].value;
+
+  GETData('GiorniPresidio.php', {"presidio": valore}).then(r => {
+    let a = new Array();
+    for (let i in r)
+      a.push(r[i].data);
+    dispatch({type: "caricaGiorni", payload: a});
+  });
+}
+
+export function EsitoPrenotazione(params) {
+  return (
+    <Pagina body= {
+      <div>
+        Il tuo codice è {codiceUnivoco};
+      </div>
+    }/>
+  )
 }
 
 function Presidi(params) {

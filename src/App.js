@@ -8,8 +8,9 @@ import {
   Esito,
   AreaRiservata,
   LogIn,
+  EsitoPrenotazione,
 } from "./components.js";
-import * as fetch from './fetch.js';
+const {GETData, postData} = require('./fetch.js');
 
 const AppContext = React.createContext(null);
 
@@ -23,6 +24,9 @@ export function App() {
     <AppContext.Provider value={{ state, dispatch }}>
       <Router>
         <Switch>
+          <Route path="/EsitoPrenotazione">
+            <EsitoPrenotazione contesto={AppContext}/>
+          </Route>
           <Route path="/LogIn">
             <LogIn contesto={AppContext}/>
           </Route>
@@ -50,26 +54,11 @@ export function App() {
 function reducer(state, action) {
 	let newState = { ...state };
   switch (action.type) {
-    case "cercaGiorni":
-      let presidio = action.payload();
-      fetch.GETData('GiorniPresidio.php', {"presidio": presidio}).then(r => {
-        let a = new Array();
-        for (let i in r)
-          a.push(r[i].data);
-        newState.giorniDisponibili = a;
-        
-      });
+    case "caricaGiorni":
+      newState.giorniDisponibili = action.payload;
       break;
     case "Carica presidi":
       newState.presidi = action.payload;
-      /*
-      fetch.GETData('Presidi.php', {}).then(r => {
-        let a = new Array();
-        for (let i in r)
-          a.push(r[i].nome);
-        newState.presidi = a;
-      });
-      */
       break;
     default:
       break;
