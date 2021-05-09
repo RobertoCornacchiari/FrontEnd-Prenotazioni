@@ -141,6 +141,7 @@ function Card(params) {
 
 let codiceUnivoco;
 let data;
+let presidio;
 
 //Pagina per la prenotazione di un tampone (scelta di data e presidio)
 export function Prenota(params) {
@@ -202,6 +203,7 @@ export function Prenota(params) {
                 console.log(codiceFiscale);
                 let e = document.getElementById("Presidi");
                 let valorePresidio = e.options[e.selectedIndex].value;
+                let nomePresidio = e.options[e.selectedIndex].text;
                 e = document.getElementById("Giorni");
                 let valoreGiorno = e.options[e.selectedIndex].value;
                 postData("prenota.php", {
@@ -219,6 +221,7 @@ export function Prenota(params) {
                   } else {
                     codiceUnivoco = r;
                     data = valoreGiorno;
+                    presidio = nomePresidio;
                     dispatch({ type: "aggiornaCodice", payload: r });
                     history.push("/EsitoPrenotazione");
                   }
@@ -227,8 +230,7 @@ export function Prenota(params) {
             >
               Submit
             </button>
-            <HomeButton style={{ "marginLeft": "5" }} />
-
+            <HomeButton style={{ marginLeft: "5" }} />
           </form>
         </div>
       }
@@ -266,19 +268,49 @@ function cercaGiorni(dispatch) {
 }
 
 export function EsitoPrenotazione(params) {
+  let history = useHistory();
   return (
     <Pagina
       body={
         <div className="corpo">
           <div className="schedaEsito">
             <h1>Resoconto prenotazione</h1>
-            <p style={{ "fontSize": "20" }}><b>Il tuo codice è <i style={{ "font-size": "25" }}>{codiceUnivoco}</i>.</b><br />
-              Dettalo all'operatore il giorno del tampone e conservalo per poter controllare lo state e il risultato del tampone.<br />
-              Puoi anche presentare il QRCode rappresentato per agevolare le procedure di autenticazione.<br/><br/>
-              Il tampone si effettuerà in data {data}</p>
+            <p style={{ fontSize: "20" }}>
+              <b>
+                Il tuo codice è{" "}
+                <i style={{ "font-size": "25" }}>{codiceUnivoco}</i>.
+              </b>
+              <br />
+              Dettalo all'operatore il giorno del tampone e conservalo per poter
+              controllare lo state e il risultato del tampone.
+              <br />
+              Puoi anche presentare il QRCode rappresentato per agevolare le
+              procedure di autenticazione.
+              <br />
+              <br />
+              Il tampone si effettuerà in data <b>{data}</b> presso il presidio{" "}
+              <b>{presidio}</b>
+            </p>
             <QRCode value={codiceUnivoco} size="300" />
             <br />
-            <HomeButton style={{ "marginTop": "10" }} />
+            <HomeButton style={{ marginTop: "10" }} />
+            <button
+              id="annullaPrenotazione"
+              className="btn btn-primary"
+              style={{ marginLeft: "5", marginTop: "10" }}
+              onClick={() => {
+                let a = confirm("Vuoi davvero annullare la prenotazione corrente? Quest'operazione non è reversibile.");
+                if (a == true) {
+                  postData("annulla_prenotazione.php", {
+                    codice: codiceUnivoco,
+                  })
+                  alert("Prenotazione annullata con successo.")
+                  history.push("/");
+                }
+              }}
+            >
+              Annulla la prenotazione
+            </button>
           </div>
         </div>
       }
@@ -358,31 +390,46 @@ export function Controlla(params) {
                 Inserisci il codice della prenotazione da controllare.
               </div>
             </div>
-            <button type="button" className="btn btn-primary" onClick={() => {
-              let codice = document.getElementById("CodicePrenotazione").value;
-              let codiceFiscale = document.getElementById("CodiceFiscale").value;
-              postData("cerca_prenotazione.php", { codice: codice, codiceFiscale: codiceFiscale }).then((r) => {
-                document.getElementById("CodicePrenotazione").value = "";
-                document.getElementById("CodiceFiscale").value = "";
-                if (r == "Errore") {
-                  console.log("Errore");
-                  history.push("/controlla");
-                  alert(
-                    "Errore nell'inserimento. Controllare di aver inserito correttamente tutti i parametri."
-                  );
-                } else {
-                  console.log(r);
-
-                  codiceUnivoco = r.codice;
-                  data = r.giorno;
-                  dispatch({ type: "aggiornaCodice", payload: r.codice });
-                  history.push("/EsitoPrenotazione");
-                }
-              });
-            }}>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => {
+                let codice = document.getElementById("CodicePrenotazione")
+                  .value;
+                let codiceFiscale = document.getElementById("CodiceFiscale")
+                  .value;
+                postData("cerca_prenotazione.php", {
+                  codice: codice,
+                  codiceFiscale: codiceFiscale,
+                }).then((r) => {
+                  document.getElementById("CodicePrenotazione").value = "";
+                  document.getElementById("CodiceFiscale").value = "";
+                  if (r == "Errore") {
+                    console.log("Errore");
+                    history.push("/controlla");
+                    alert(
+                      "Errore nell'inserimento. Controllare di aver inserito correttamente tutti i parametri."
+                    );
+                  } else if (r == "Annullata") {
+                    console.log("Annullata");
+                    history.push("/controlla");
+                    alert(
+                      "La prenotazione cercata è stata annullata. Effettuarne una nuova nella sezione prenota."
+                    );
+                  } else {
+                    console.log(r);
+                    codiceUnivoco = r.codice;
+                    data = r.giorno;
+                    presidio = r.nome;
+                    dispatch({ type: "aggiornaCodice", payload: r.codice });
+                    history.push("/EsitoPrenotazione");
+                  }
+                });
+              }}
+            >
               Controlla
             </button>
-            <HomeButton style={{ "marginLeft": "5" }} />
+            <HomeButton style={{ marginLeft: "5" }} />
           </form>
         </div>
       }
@@ -408,7 +455,7 @@ export function Esito() {
             <button type="submit" className="btn btn-primary">
               Visualizza l'esito
             </button>
-            <HomeButton style={{ "marginLeft": "5" }} />
+            <HomeButton style={{ marginLeft: "5" }} />
           </form>
         </div>
       }
@@ -447,7 +494,7 @@ export function LogIn() {
             <button type="submit" className="btn btn-primary">
               Accedi
             </button>
-            <HomeButton style={{ "marginLeft": "5" }} />
+            <HomeButton style={{ marginLeft: "5" }} />
           </form>
         </div>
       }
