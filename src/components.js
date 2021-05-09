@@ -436,12 +436,30 @@ export function Controlla(params) {
     />
   );
 }
-export function Esito() {
+
+export function Esito(params) {
+  const { state, dispatch } = useContext(params.contesto);
+  const history = useHistory();
   return (
     <Pagina
       body={
         <div className="Form">
           <form>
+            <div className="mb-3">
+              <label htmlFor="CodiceFiscale" className="form-label">
+                Codice Fiscale
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="CodiceFiscale"
+                aria-describedby="CodiceFiscaleHelp"
+                required
+              ></input>
+              <div id="CodiceFiscaleHelp" className="form-text">
+                Inserisci il tuo codice fiscale (lettere maiuscole).
+              </div>
+            </div>
             <div className="mb-3">
               <label htmlFor="CodiceFiscale" className="form-label">
                 Codice Prenotazione
@@ -450,10 +468,27 @@ export function Esito() {
                 type="text"
                 className="form-control"
                 id="CodicePrenotazione"
+                aria-describedby="CodiceHelp"
+                required
               ></input>
+              <div id="CodiceHelp" className="form-text">
+                Inserisci il codice della prenotazione di cui si vuole sapere l'esito.
+              </div>
             </div>
-            <button type="submit" className="btn btn-primary">
-              Visualizza l'esito
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => {
+                let codice = document.getElementById("CodicePrenotazione")
+                  .value;
+                let codiceFiscale = document.getElementById("CodiceFiscale")
+                  .value;
+                postData("cerca_esito.php", {
+                  codice: codice,
+                  codiceFiscale: codiceFiscale,
+                })}}
+            >
+              Controlla l'esito
             </button>
             <HomeButton style={{ marginLeft: "5" }} />
           </form>
