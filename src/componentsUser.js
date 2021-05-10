@@ -12,6 +12,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import { HomeButton } from "./utility";
+
 var QRCode = require("qrcode.react");
 
 const { GETData, postData } = require("./fetch.js");
@@ -21,41 +22,24 @@ let bool = 0;
 function Pagina(props) {
   return (
     <div className="Pagina">
-      <nav class="navbar sticky-top navbar-light bg-light">
+      <nav className="navbar sticky-top navbar-light bg-light">
         <img
           src={assets.Logo}
           width="160"
           height="30"
-          class="d-inline-block align-top"
+          className="d-inline-block align-top"
           alt=""
         />
         <div className="Titolo">PRENOTAZIONE TAMPONI</div>
-        <form class="form-inline my-2 my-lg-0">
+        <form className="form-inline my-2 my-lg-0">
           <Link to="/LogIn">
-            <button class="btn btn-primary my-2 my-sm-0">Accedi</button>
+            <button className="btn btn-primary my-2 my-sm-0">Accedi</button>
           </Link>
         </form>
       </nav>
-      {/*
-        <div className="container">
-          <div className="row">
-            <div className="col">
-              <Logo />
-            </div>
-
-            <div className="col Titolo">
-
-              PRENOTAZIONE TAMPONI
-            </div>
-            <div className="col">
-              <Link to="/LogIn">
-                <button className="btn btn-primary LogIn">Accedi</button>
-              </Link>
-            </div>
-          </div>
-        </div>
-        */}
-      {props.body}
+      <div className="bodyPrincipale">
+        {props.body}
+      </div>
       <footer>Footer</footer>
     </div>
   );
@@ -130,7 +114,7 @@ function Card(params) {
         </Link>
         <p className="card-text">{params.testo}</p>
         <Link to={link}>
-          <button className="btn btn-primary" style={{ "font-size": "20px" }}>
+          <button className="btn btn-primary" style={{ "fontSize": "20px" }}>
             {params.titolo}
           </button>
         </Link>
@@ -279,7 +263,7 @@ export function EsitoPrenotazione(params) {
             <p style={{ fontSize: "20" }}>
               <b>
                 Il tuo codice è{" "}
-                <i style={{ "font-size": "25" }}>{codiceUnivoco}</i>.
+                <i style={{ "fontSize": "25" }}>{codiceUnivoco}</i>.
               </b>
               <br />
               Dettalo all'operatore il giorno del tampone e conservalo per poter
@@ -292,7 +276,7 @@ export function EsitoPrenotazione(params) {
               Il tampone si effettuerà in data <b>{data}</b> presso il presidio{" "}
               <b>{presidio}</b>
             </p>
-            <QRCode value={codiceUnivoco} size="300" />
+            <QRCode value={codiceUnivoco} size={300} />
             <br />
             <HomeButton style={{ marginTop: "10" }} />
             <button
@@ -491,19 +475,16 @@ export function Esito(params) {
                   document.getElementById("CodicePrenotazione").value = "";
                   document.getElementById("CodiceFiscale").value = "";
                   if (r == "Errore") {
-                    console.log("Errore");
                     history.push("/esito");
                     alert(
                       "Errore nell'inserimento. Controllare di aver inserito correttamente tutti i parametri."
                     );
                   } else if (r == "Annullata") {
-                    console.log("Annullata");
                     history.push("/esito");
                     alert(
                       "La prenotazione cercata è stata annullata. Effettuarne una nuova nella sezione prenota."
                     );
                   } else {
-                    console.log(r);
                     codiceUnivoco = r.codice;
                     data = r.giorno;
                     presidio = r.nome;
@@ -524,24 +505,6 @@ export function Esito(params) {
   );
 }
 
-export function EsitoTampone(params) {
-  const history = useHistory();
-  return (
-    <Pagina
-      body={
-        <div>
-          Esito: {esito}.<br/>
-          Presidio: {presidio}.<br/>
-          CodicePrenotazione: {codiceUnivoco}.<br/>
-          Data: {data}.<br/>
-        </div>
-      }/>
-  )
-}
-
-export function AreaRiservata() {
-  return <div className="pagina"></div>;
-}
 export function LogIn() {
   return (
     <Pagina
@@ -568,7 +531,16 @@ export function LogIn() {
                 id="Password"
               ></input>
             </div>
-            <button type="submit" className="btn btn-primary">
+            <button type="button" className="btn btn-primary" onClick={() => {
+              let password = document.getElementById("Password").value;
+              let nomeUtente = document.getElementById("NomeUtente");
+              postData('esito_login.php', {
+                password : password,
+                nomeUtente : nomeUtente,
+              }).then(r => {
+                console.log(r);
+              })
+            }}>
               Accedi
             </button>
             <HomeButton style={{ marginLeft: "5" }} />
@@ -585,4 +557,35 @@ function Image(props) {
 
 function Logo(props) {
   return <img src={assets.Logo} style={{ width: 160, height: 35 }} />;
+}
+
+export function EsitoTampone(params) {
+  return (
+    <Pagina
+      body={
+        <div className="schedaEsito" style={{"fontSize" : "30"}}>
+          CodicePrenotazione: {codiceUnivoco}.<br/>
+          Data: {data}.<br/>
+          Presidio: {presidio}.<br/>
+          <EsitoCheck /><br/>
+          <HomeButton />
+        </div>
+      }/>
+  )
+}
+
+function EsitoCheck() {
+  if (esito == "pending")
+  return (
+    <p style={{"color" : "black"}}>Positivo.</p>
+  );
+  if (esito == "positivo")
+    return (
+      <p style={{"color" : "white", "backgroundColor": "green"}}>Positivo.</p>
+    );
+  if (esito == "negativo")
+    return (
+      <p style={{"color" : "white", "backgroundColor": "red"}}>Negativo.</p>
+    );
+  
 }

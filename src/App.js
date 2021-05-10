@@ -9,8 +9,13 @@ import {
   AreaRiservata,
   LogIn,
   EsitoPrenotazione,
-  EsitoTampone
-} from "./components.js";
+  EsitoTampone,
+} from "./componentsUser.js";
+import {
+  Amministratore,
+  SchermataAmministatore,
+
+} from "./componentsAdmin.js";
 import PrivateRoute from "./PrivateRoute";
 const {GETData, postData} = require('./fetch.js');
 
@@ -18,18 +23,20 @@ const AppContext = React.createContext(null);
 
 export function App() {
   const [state, dispatch] = useReducer(reducer, {
-    presidi: ['Brescia Fiere', 'Centro Congressi'],
+    presidi: new Array(),
     giorniDisponibili: new Array(),
     codiceUnivoco: 0,
-
   });
   
   return (
     <AppContext.Provider value={{ state, dispatch }}>
       <Router>
         <Switch>
-          <PrivateRoute path="/EsitoPrenotazione" codice={state.codiceUnivoco} component={EsitoPrenotazione} contesto={AppContext}/>
-          <PrivateRoute path="/EsitoTampone" codice={state.codiceUnivoco} component={EsitoTampone} contesto={AppContext}/>
+          <Route exact path="/schermataAmministratore">
+            <Amministratore />
+          </Route>
+          <PrivateRoute exact path="/EsitoPrenotazione" codice={state.codiceUnivoco!=0} component={EsitoPrenotazione} contesto={AppContext}/>
+          <PrivateRoute exact path="/EsitoTampone" codice={state.codiceUnivoco!=0} component={EsitoTampone} contesto={AppContext}/>
           <Route exact path="/LogIn">
             <LogIn contesto={AppContext}/>
           </Route>
@@ -42,10 +49,7 @@ export function App() {
           <Route exact path="/esito">
             <Esito contesto={AppContext}/>
           </Route>
-          <Route exact path="/areaRiservata">
-            <AreaRiservata contesto={AppContext}/>
-          </Route>
-          <Route exact path="/">
+          <Route path="/">
             <HomePage contesto={AppContext}/>
           </Route>
         </Switch>
