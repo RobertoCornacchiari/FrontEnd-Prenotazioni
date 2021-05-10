@@ -142,6 +142,7 @@ function Card(params) {
 let codiceUnivoco;
 let data;
 let presidio;
+let esito;
 
 //Pagina per la prenotazione di un tampone (scelta di data e presidio)
 export function Prenota(params) {
@@ -486,7 +487,32 @@ export function Esito(params) {
                 postData("cerca_esito.php", {
                   codice: codice,
                   codiceFiscale: codiceFiscale,
-                })}}
+                }).then(r => {
+                  document.getElementById("CodicePrenotazione").value = "";
+                  document.getElementById("CodiceFiscale").value = "";
+                  if (r == "Errore") {
+                    console.log("Errore");
+                    history.push("/esito");
+                    alert(
+                      "Errore nell'inserimento. Controllare di aver inserito correttamente tutti i parametri."
+                    );
+                  } else if (r == "Annullata") {
+                    console.log("Annullata");
+                    history.push("/esito");
+                    alert(
+                      "La prenotazione cercata è stata annullata. Effettuarne una nuova nella sezione prenota."
+                    );
+                  } else {
+                    console.log(r);
+                    codiceUnivoco = r.codice;
+                    data = r.giorno;
+                    presidio = r.nome;
+                    esito = r.esito;
+                    dispatch({ type: "aggiornaCodice", payload: r.codice });
+                    history.push("/EsitoTampone");
+                  }
+                });
+              }}
             >
               Controlla l'esito
             </button>
@@ -497,6 +523,22 @@ export function Esito(params) {
     />
   );
 }
+
+export function EsitoTampone(params) {
+  const history = useHistory();
+  return (
+    <Pagina
+      body={
+        <div>
+          Esito: {esito}.<br/>
+          Presidio: {presidio}.<br/>
+          CodicePrenotazione: {codiceUnivoco}.<br/>
+          Data: {data}.<br/>
+        </div>
+      }/>
+  )
+}
+
 export function AreaRiservata() {
   return <div className="pagina"></div>;
 }

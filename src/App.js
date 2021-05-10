@@ -9,6 +9,7 @@ import {
   AreaRiservata,
   LogIn,
   EsitoPrenotazione,
+  EsitoTampone
 } from "./components.js";
 import PrivateRoute from "./PrivateRoute";
 const {GETData, postData} = require('./fetch.js');
@@ -28,6 +29,7 @@ export function App() {
       <Router>
         <Switch>
           <PrivateRoute path="/EsitoPrenotazione" codice={state.codiceUnivoco} component={EsitoPrenotazione} contesto={AppContext}/>
+          <PrivateRoute path="/EsitoTampone" codice={state.codiceUnivoco} component={EsitoTampone} contesto={AppContext}/>
           <Route exact path="/LogIn">
             <LogIn contesto={AppContext}/>
           </Route>
