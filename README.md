@@ -1,10 +1,10 @@
 # Front End React
 *Creazione dell'interfaccia per la richiesta di un tampone*\
-**Caratteristiche principali:**
+***Caratteristiche principali:***
 - Accesso al sito tramite un nome utente e una password per i sanitari
 - visualizzazione delle date disponibili dopo aver selezionato il presidio
 
-**User story:** 
+***User story:*** 
 - **Come** utente\
 **voglio** poter prenotare un tampone\
 - **Come** utente\ 
