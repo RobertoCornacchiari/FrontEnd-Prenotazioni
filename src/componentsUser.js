@@ -32,8 +32,11 @@ function Pagina(props) {
         />
         <div className="Titolo">PRENOTAZIONE TAMPONI</div>
         <form className="form-inline my-2 my-lg-0">
+          <Link to="/schermataAmministratore">
+            <button className="btn btn-primary my-2 my-sm-0">Area Riservata</button>
+          </Link>
           <Link to="/LogIn">
-            <button className="btn btn-primary my-2 my-sm-0">Accedi</button>
+            <button className="btn btn-primary my-2 my-sm-0" style={{"marginLeft": "5"}}>Accedi</button>
           </Link>
         </form>
       </nav>
@@ -545,13 +548,10 @@ export function LogIn(params) {
                   alert("Credenziali sbagliate. Controllare di averle inserite correttamente.");
                 } else {
                   if (r.admin == "1") {
-                    dispatch({type: "LogIn", payload: {}});
-                    sessionStorage.setItem("Permessi", JSON.stringify(r));
                     sessionStorage.setItem("Permessi", JSON.stringify(r));
                     history.push("/schermataAmministratore");
                     
                   } else if (r.admin == "0") {
-                    sessionStorage.setItem("Permessi", "Operatore");
                     sessionStorage.setItem("Permessi", "Operatore");
                     history.push("/schermataSanitari");
                   }

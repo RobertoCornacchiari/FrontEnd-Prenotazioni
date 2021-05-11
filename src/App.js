@@ -11,16 +11,13 @@ import {
   EsitoPrenotazione,
   EsitoTampone,
 } from "./componentsUser.js";
-import {
-  Amministratore,
-  SchermataAmministatore,
-
-} from "./componentsAdmin.js";
-import PrivateRoute from "./PrivateRoute";
-const {GETData, postData} = require('./fetch.js');
+import { Amministratore, SchermataAmministatore } from "./componentsAdmin.js";
+import {PrivateRoute, PrivateRouteX }from "./PrivateRoute";
+import { FormCheck } from "react-bootstrap";
+const { GETData, postData } = require("./fetch.js");
 
 const AppContext = React.createContext(null);
-let admin = false;
+
 export function App() {
   const [state, dispatch] = useReducer(reducer, {
     presidi: new Array(),
@@ -32,37 +29,58 @@ export function App() {
     <AppContext.Provider value={{ state, dispatch }}>
       <Router>
         <Switch>
-        <PrivateRoute exact path="/schermataAmministratore" codice={admin} component={Amministratore}/>
-          <PrivateRoute exact path="/EsitoPrenotazione" codice={state.codiceUnivoco!=0} component={EsitoPrenotazione} contesto={AppContext}/>
-          <PrivateRoute exact path="/EsitoTampone" codice={state.codiceUnivoco!=0} component={EsitoTampone} contesto={AppContext}/>
+          <PrivateRouteX
+            exact
+            path="/schermataAmministratore"
+            codice={() => {
+              if (JSON.parse(sessionStorage.getItem("Permessi")) == null)
+                return false;
+              else {
+                if (JSON.parse(sessionStorage.getItem("Permessi")).admin == "1")
+                  return true;
+                else return false;
+              }
+            }}
+            component={Amministratore}
+          />
+          <PrivateRoute
+            exact
+            path="/EsitoPrenotazione"
+            codice={state.codiceUnivoco != 0}
+            component={EsitoPrenotazione}
+            contesto={AppContext}
+          />
+          <PrivateRoute
+            exact
+            path="/EsitoTampone"
+            codice={state.codiceUnivoco != 0}
+            component={EsitoTampone}
+            contesto={AppContext}
+          />
           <Route exact path="/LogIn">
-            <LogIn contesto={AppContext}/>
+            <LogIn contesto={AppContext} />
           </Route>
           <Route exact path="/prenota">
-            <Prenota contesto={AppContext}/>
+            <Prenota contesto={AppContext} /> 
           </Route>
           <Route exact path="/controlla">
-            <Controlla contesto={AppContext}/>
+            <Controlla contesto={AppContext} />
           </Route>
           <Route exact path="/esito">
-            <Esito contesto={AppContext}/>
+            <Esito contesto={AppContext} />
           </Route>
           <Route exact path="/">
-            <HomePage contesto={AppContext}/>
+            <HomePage contesto={AppContext} />
           </Route>
-          
         </Switch>
       </Router>
     </AppContext.Provider>
   );
-} 
-
-export function slogga() {
-  admin = false;
 }
 
+
 function reducer(state, action) {
-	let newState = { ...state };
+  let newState = { ...state };
   switch (action.type) {
     case "caricaGiorni":
       newState.giorniDisponibili = action.payload;
@@ -73,16 +91,10 @@ function reducer(state, action) {
     case "aggiornaCodice":
       newState.codiceUnivoco = action.payload;
       break;
-    case "LogIn":
-      newState.admin = true;
-      admin = true;
-    break;
-    case "LogOut":
-      newState.admin = false;
-    break;
+
     default:
       break;
   }
   console.log("stato", newState);
-	return newState;
+  return newState;
 }

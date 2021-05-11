@@ -12,3 +12,14 @@ export function HomeButton(props) {
         </Link>
     )
 }
+
+export function HomeButtonAdmin(props) {
+    let style = props.style;
+    return (
+        <Link to="/schermataAmministratore">
+            <button className="btn btn-primary" style={style}>
+                Torna alla Home
+            </button>
+        </Link>
+    )
+}
