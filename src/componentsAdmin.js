@@ -3,6 +3,7 @@ import "./style.css";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import assets from "../img/*.png";
 import { HomeButtonAdmin } from "./utility";
+import { Table } from "react-bootstrap";
 
 const { GETData, postData } = require("./fetch.js");
 
@@ -12,6 +13,7 @@ export function Amministratore() {
   const [state, dispatch] = useReducer(reducer, {
     presidi: new Array(),
     operatori: new Array(),
+    prenotazioniGiornaliere: new Array(),
   });
 
   return (
@@ -27,6 +29,9 @@ export function Amministratore() {
           <Route exact path="/aggiungiPresidio">
             <AggiungiPresidio contesto={AppContext} />
           </Route>
+          <Route exact path="/visualizzaDati">
+            <VisualizzaDati contesto={AppContext} />
+          </Route>
         </Switch>
       </Router>
     </AppContext.Provider>
@@ -41,6 +46,9 @@ function reducer(state, action) {
       break;
     case "Carica operatori":
       newState.operatori = action.payload;
+      break;
+    case "Prenotazioni giornaliere":
+      newState.prenotazioniGiornaliere = action.payload;
       break;
     default:
       break;
@@ -99,9 +107,9 @@ export function SchermataAmministatore(params) {
               </div>
               <div className="col-lg-4 col-sm-12 col-12">
                 <Card
-                  nome="prenotazioni"
-                  titolo="Visualizza i dati sulle prenotazioni"
-                  testo="Accedi ai dati sulle prenotazioni, controlla quante ne sono state effettuate tra 2 date e quelle odierne."
+                  nome="visualizzaDati"
+                  titolo="Visualizza i dati"
+                  testo="Accedi ai dati sulle prenotazioni per visualizzare l'andamento."
                   contesto={params.contesto}
                   immagine={assets.visualizzadati}
                 />
@@ -204,7 +212,7 @@ function AggiungiOperatore(params) {
                     let e = document.getElementById("Operatori");
                     let valore = e.options[e.selectedIndex].value;
                     postData("elimina_operatore.php", {
-                      operatore: valore,
+                      nomeUtente: valore,
                     });
                     alert("Operatore eliminato con successo.");
                     bool = 0;
@@ -273,14 +281,17 @@ function AggiungiOperatore(params) {
                   nomeUtente: nome,
                   password: password,
                   ripetiPassword: ripetiPassword,
-                  admin: JSON.parse(sessionStorage.getItem("Permessi")).nomeUtente,
+                  admin: JSON.parse(sessionStorage.getItem("Permessi"))
+                    .nomeUtente,
                 }).then((r) => {
+                  document.getElementById("password").value = "";
+                  document.getElementById("ripetiPassword").value = "";
                   if (r == "Utilizzato")
                     alert("Errore nell'inserimento. Nome già utilizzato.");
-                    else if (r == "Errore"){
-                        alert("Le password inserite non coincidono, riprovare.")
-                    }
-                  else {
+                  else if (r == "Errore") {
+                    alert("Le password inserite non coincidono, riprovare.");
+                  } else {
+                    document.getElementById("NomeOperatore").value = "";
                     alert("Operatore inserito correttamente.");
                     bool = 0;
                     carica();
@@ -443,6 +454,62 @@ function Presidi(params) {
 function rimuoviSpazi(stringa) {
   return stringa.replace(/\s/g, "");
 }
+
+function VisualizzaDati(params) {
+  const { state, dispatch } = useContext(params.contesto);
+  GETData("Lista_prenotazioni_giornaliere.php", {}).then((r) => {
+    dispatch({ type: "Prenotazioni giornaliere", payload: r });
+  });
+  return (
+    <PaginaAdmin
+      body={
+        <div className="corpo">
+          <div className="dati">
+            <div className="prenotazioniGiornaliere">
+              <h2>Prenotazioni Giornaliere</h2>
+              <PrenotazioniGiornaliere contesto={params.contesto} />
+            </div>
+            <div className="prenotazioneTraDate">
+              <h2>Prenotazioni tra 2 date</h2>
+              <SelettorePresidi contesto={params.contesto}/>
+            </div>
+          </div>
+        </div>
+      }
+    />
+  );
+}
+
+function PrenotazioniGiornaliere(params) {
+  const { state, dispatch } = useContext(params.contesto);
+  let array = state.prenotazioniGiornaliere;
+  let prenotazioni = [];
+  array.forEach((element, i) => {
+    let j = i + 1;
+    prenotazioni[prenotazioni.length] = (
+      <tr key={i}>
+        <td>{j}</td>
+        <td>{element.codice_fiscale}</td>
+        <td>{element.codice}</td>
+        <td>{element.nome}</td>
+      </tr>
+    );
+  });
+  return (
+    <Table striped bordered hover size="sm">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Codice Fiscale</th>
+          <th>Codice</th>
+          <th>Presidio</th>
+        </tr>
+      </thead>
+      <tbody>{prenotazioni}</tbody>
+    </Table>
+  );
+}
+
 function Image(props) {
   return <img src={props.immagine} className="immagineCard" />;
 }
