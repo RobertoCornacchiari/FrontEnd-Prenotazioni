@@ -20,21 +20,19 @@ import PrivateRoute from "./PrivateRoute";
 const {GETData, postData} = require('./fetch.js');
 
 const AppContext = React.createContext(null);
-
+let admin = false;
 export function App() {
   const [state, dispatch] = useReducer(reducer, {
     presidi: new Array(),
     giorniDisponibili: new Array(),
     codiceUnivoco: 0,
+    admin: false,
   });
-  
   return (
     <AppContext.Provider value={{ state, dispatch }}>
       <Router>
         <Switch>
-          <Route exact path="/schermataAmministratore">
-            <Amministratore />
-          </Route>
+        <PrivateRoute exact path="/schermataAmministratore" codice={admin} component={Amministratore}/>
           <PrivateRoute exact path="/EsitoPrenotazione" codice={state.codiceUnivoco!=0} component={EsitoPrenotazione} contesto={AppContext}/>
           <PrivateRoute exact path="/EsitoTampone" codice={state.codiceUnivoco!=0} component={EsitoTampone} contesto={AppContext}/>
           <Route exact path="/LogIn">
@@ -49,13 +47,18 @@ export function App() {
           <Route exact path="/esito">
             <Esito contesto={AppContext}/>
           </Route>
-          <Route path="/">
+          <Route exact path="/">
             <HomePage contesto={AppContext}/>
           </Route>
+          
         </Switch>
       </Router>
     </AppContext.Provider>
   );
+} 
+
+export function slogga() {
+  admin = false;
 }
 
 function reducer(state, action) {
@@ -70,6 +73,13 @@ function reducer(state, action) {
     case "aggiornaCodice":
       newState.codiceUnivoco = action.payload;
       break;
+    case "LogIn":
+      newState.admin = true;
+      admin = true;
+    break;
+    case "LogOut":
+      newState.admin = false;
+    break;
     default:
       break;
   }

@@ -2,6 +2,7 @@ import React, { useReducer, useContext, useEffect, useState } from "react";
 import "./style.css";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import assets from "../img/*.png";
+import { slogga } from "./App.js";
 
 const { GETData, postData } = require('./fetch.js');
 
@@ -90,8 +91,11 @@ function PaginaAdmin(props) {
                 />
                 <div className="Titolo">PRENOTAZIONE TAMPONI-AMMINISTRATORE</div>
                 <form className="form-inline my-2 my-lg-0">
-                    <Link to="/LogIn">
-                        <button className="btn btn-primary my-2 my-sm-0">Disconnetti</button>
+                    <Link to="/">
+                        <button className="btn btn-primary my-2 my-sm-0" onClick={() => {
+                            sessionStorage.setItem("Permessi", JSON.stringify("Niente"));
+                            slogga();
+                        }}>Disconnetti</button>
                     </Link>
                 </form>
             </nav>

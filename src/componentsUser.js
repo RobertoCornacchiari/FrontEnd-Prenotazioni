@@ -505,7 +505,9 @@ export function Esito(params) {
   );
 }
 
-export function LogIn() {
+export function LogIn(params) {
+  const { state, dispatch } = useContext(params.contesto);
+  let history = useHistory();
   return (
     <Pagina
       body={
@@ -532,13 +534,28 @@ export function LogIn() {
               ></input>
             </div>
             <button type="button" className="btn btn-primary" onClick={() => {
-              let password = document.getElementById("Password").value;
-              let nomeUtente = document.getElementById("NomeUtente");
+              let passwordCampo = document.getElementById("Password").value;
+              let nomeUtenteCampo = document.getElementById("NomeUtente").value;
               postData('esito_login.php', {
-                password : password,
-                nomeUtente : nomeUtente,
+                password: passwordCampo,
+                nomeUtente: nomeUtenteCampo,
               }).then(r => {
-                console.log(r);
+                document.getElementById("Password").value = "";
+                if (r == "Errore") {
+                  alert("Credenziali sbagliate. Controllare di averle inserite correttamente.");
+                } else {
+                  if (r.admin == "1") {
+                    dispatch({type: "LogIn", payload: {}});
+                    sessionStorage.setItem("Permessi", JSON.stringify(r));
+                    sessionStorage.setItem("Permessi", JSON.stringify(r));
+                    history.push("/schermataAmministratore");
+                    
+                  } else if (r.admin == "0") {
+                    sessionStorage.setItem("Permessi", "Operatore");
+                    sessionStorage.setItem("Permessi", "Operatore");
+                    history.push("/schermataSanitari");
+                  }
+                }
               })
             }}>
               Accedi
