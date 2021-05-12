@@ -23,3 +23,14 @@ export function HomeButtonAdmin(props) {
         </Link>
     )
 }
+
+export function HomeButtonWorker(props) {
+    let style = props.style;
+    return (
+        <Link to="/schermataOperatore">
+            <button className="btn btn-primary" style={style}>
+                Torna alla Home
+            </button>
+        </Link>
+    )
+}

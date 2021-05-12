@@ -13,7 +13,7 @@ import {
 } from "./componentsUser.js";
 import { Amministratore, SchermataAmministatore } from "./componentsAdmin.js";
 import {PrivateRoute, PrivateRouteX }from "./PrivateRoute";
-import { FormCheck } from "react-bootstrap";
+import { OperatoreSanitario, SchermataOperatore } from "./componentsWorker";
 const { GETData, postData } = require("./fetch.js");
 
 const AppContext = React.createContext(null);
@@ -24,6 +24,7 @@ export function App() {
     giorniDisponibili: new Array(),
     codiceUnivoco: 0,
     admin: false,
+    worker: false,
   });
   return (
     <AppContext.Provider value={{ state, dispatch }}>
@@ -42,6 +43,20 @@ export function App() {
               }
             }}
             component={Amministratore}
+          />
+          <PrivateRouteX
+            exact
+            path="/schermataOperatore"
+            codice={() => {
+              if (JSON.parse(sessionStorage.getItem("Permessi")) == null)
+                return false;
+              else {
+                if (JSON.parse(sessionStorage.getItem("Permessi")).admin == "0")
+                  return true;
+                else return false;
+              }
+            }}
+            component={OperatoreSanitario}
           />
           <PrivateRoute
             exact

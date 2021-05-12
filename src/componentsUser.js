@@ -98,14 +98,13 @@ export function HomePage(params) {
               </div>
             </div>
           </div>
-          {/*<Link to="/areaRiservata"><Card nome="areaRiservata"/></Link>*/}
         </div>
       }
     />
   );
 }
 
-function Card(params) {
+export function Card(params) {
   const { state, dispatch } = useContext(params.contesto);
   let link = "/" + params.nome;
   return (
@@ -552,8 +551,8 @@ export function LogIn(params) {
                     history.push("/schermataAmministratore");
                     
                   } else if (r.admin == "0") {
-                    sessionStorage.setItem("Permessi", "Operatore");
-                    history.push("/schermataSanitari");
+                    sessionStorage.setItem("Permessi", JSON.stringify(r));
+                    history.push("/schermataOperatore");
                   }
                 }
               })

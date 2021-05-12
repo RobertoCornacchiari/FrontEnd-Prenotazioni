@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import assets from "../img/*.png";
 import { HomeButtonAdmin } from "./utility";
 import { Table } from "react-bootstrap";
+import {Card} from "./componentsUser";
 
 const { GETData, postData } = require("./fetch.js");
 
@@ -14,6 +15,7 @@ export function Amministratore() {
     presidi: new Array(),
     operatori: new Array(),
     prenotazioniGiornaliere: new Array(),
+    prenotazioniTraDate: new Array(),
   });
 
   return (
@@ -30,7 +32,7 @@ export function Amministratore() {
             <AggiungiPresidio contesto={AppContext} />
           </Route>
           <Route exact path="/visualizzaDati">
-            <VisualizzaDati contesto={AppContext} />
+            <VisualizzaDati contesto={AppContext} home={<HomeButtonAdmin/>}/>
           </Route>
         </Switch>
       </Router>
@@ -49,6 +51,9 @@ function reducer(state, action) {
       break;
     case "Prenotazioni giornaliere":
       newState.prenotazioniGiornaliere = action.payload;
+      break;
+    case "Prenotazioni tra date":
+      newState.prenotazioniTraDate = action.payload;
       break;
     default:
       break;
@@ -154,26 +159,7 @@ function PaginaAdmin(props) {
   );
 }
 
-function Card(params) {
-  const { state, dispatch } = useContext(params.contesto);
-  let link = "/" + params.nome;
-  return (
-    <div className="card">
-      <h5 className="card-header">{params.titolo}</h5>
-      <div className="card-body">
-        <Link to={link}>
-          <Image immagine={params.immagine} />
-        </Link>
-        <p className="card-text">{params.testo}</p>
-        <Link to={link}>
-          <button className="btn btn-primary" style={{ fontSize: "20px" }}>
-            {params.titolo}
-          </button>
-        </Link>
-      </div>
-    </div>
-  );
-}
+
 
 function AggiungiOperatore(params) {
   const { state, dispatch } = useContext(params.contesto);
@@ -454,12 +440,17 @@ function Presidi(params) {
 function rimuoviSpazi(stringa) {
   return stringa.replace(/\s/g, "");
 }
-
-function VisualizzaDati(params) {
+let boolean = true;
+export function VisualizzaDati(params) {
   const { state, dispatch } = useContext(params.contesto);
-  GETData("Lista_prenotazioni_giornaliere.php", {}).then((r) => {
-    dispatch({ type: "Prenotazioni giornaliere", payload: r });
-  });
+  const home = params.home;
+  if (boolean) {
+    GETData("Lista_prenotazioni_giornaliere.php", {}).then((r) => {
+      dispatch({ type: "Prenotazioni giornaliere", payload: r });
+    });
+    boolean = false;
+  }
+
   return (
     <PaginaAdmin
       body={
@@ -471,29 +462,38 @@ function VisualizzaDati(params) {
             </div>
             <div className="prenotazioneTraDate">
               <h2>Prenotazioni tra 2 date</h2>
-              <SelettorePresidi contesto={params.contesto}/>
+              <SelettorePresidi contesto={params.contesto} />
               <div className="pickers">
-              Da: <DatePicker numero="1"/>
-              A: <DatePicker numero="2"/>
+                Da: <DatePicker numero="1" />
+                A: <DatePicker numero="2" />
               </div>
-              <button className="btn btn-primary"  style={{"marginTop": "10"}}onClick={()=>{
-                let e = document.getElementById("Presidi");
-                let valore = e.options[e.selectedIndex].value;
-                let dataIniziale = document.getElementById("datepicker1").value;
-                let dataFinale = document.getElementById("datepicker2").value;
-                if (dataIniziale > dataFinale)
-                  alert("Errore nell'inserimento delle date.");
-                else {
-                  GETData('prenotazioni_tra_date.php', {
-                    presidio: valore,
-                    giornoIniziale: dataIniziale,
-                    giornoFinale: dataFinale,
-                  }).then(r => {
-                    
-                  })
-                }
-              }}>Cerca</button>
+              <button
+                className="btn btn-primary"
+                style={{ marginTop: "10" }}
+                onClick={() => {
+                  let e = document.getElementById("Presidi");
+                  let valore = e.options[e.selectedIndex].value;
+                  let dataIniziale =
+                    document.getElementById("datepicker1").value;
+                  let dataFinale = document.getElementById("datepicker2").value;
+                  if (dataIniziale > dataFinale)
+                    alert("Errore nell'inserimento delle date.");
+                  else {
+                    GETData("prenotazioni_tra_date.php", {
+                      presidio: valore,
+                      giornoIniziale: dataIniziale,
+                      giornoFinale: dataFinale,
+                    }).then((r) => {
+                      dispatch({ type: "Prenotazioni tra date", payload: r });
+                    });
+                  }
+                }}
+              >
+                Cerca
+              </button>
+              <PrenotazioniTraDate contesto={params.contesto} />
             </div>
+            {home}
           </div>
         </div>
       }
@@ -501,14 +501,42 @@ function VisualizzaDati(params) {
   );
 }
 
-function DatePicker(params) {
-  let codice = "datepicker" + params.numero;
-  return(
-    <input type="date" id={codice}></input>
-  )
+export function PrenotazioniTraDate(params) {
+  const { state, dispatch } = useContext(params.contesto);
+  let array = state.prenotazioniTraDate;
+  let prenotazioni = [];
+  array.forEach((element, i) => {
+    let j = i + 1;
+    let e = element.quanti;
+    if (e == null) e = 0;
+    prenotazioni[prenotazioni.length] = (
+      <tr key={i}>
+        <td>{j}</td>
+        <td>{element.data}</td>
+        <td>{e}</td>
+      </tr>
+    );
+  });
+  return (
+    <Table striped bordered hover size="sm" style={{ marginTop: "10" }}>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Data</th>
+          <th>Numero prenotazioni</th>
+        </tr>
+      </thead>
+      <tbody>{prenotazioni}</tbody>
+    </Table>
+  );
 }
 
-function PrenotazioniGiornaliere(params) {
+export function DatePicker(params) {
+  let codice = "datepicker" + params.numero;
+  return <input type="date" id={codice}></input>;
+}
+
+export function PrenotazioniGiornaliere(params) {
   const { state, dispatch } = useContext(params.contesto);
   let array = state.prenotazioniGiornaliere;
   let prenotazioni = [];
