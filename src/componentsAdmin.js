@@ -472,12 +472,40 @@ function VisualizzaDati(params) {
             <div className="prenotazioneTraDate">
               <h2>Prenotazioni tra 2 date</h2>
               <SelettorePresidi contesto={params.contesto}/>
+              <div className="pickers">
+              Da: <DatePicker numero="1"/>
+              A: <DatePicker numero="2"/>
+              </div>
+              <button className="btn btn-primary"  style={{"marginTop": "10"}}onClick={()=>{
+                let e = document.getElementById("Presidi");
+                let valore = e.options[e.selectedIndex].value;
+                let dataIniziale = document.getElementById("datepicker1").value;
+                let dataFinale = document.getElementById("datepicker2").value;
+                if (dataIniziale > dataFinale)
+                  alert("Errore nell'inserimento delle date.");
+                else {
+                  GETData('prenotazioni_tra_date.php', {
+                    presidio: valore,
+                    giornoIniziale: dataIniziale,
+                    giornoFinale: dataFinale,
+                  }).then(r => {
+                    
+                  })
+                }
+              }}>Cerca</button>
             </div>
           </div>
         </div>
       }
     />
   );
+}
+
+function DatePicker(params) {
+  let codice = "datepicker" + params.numero;
+  return(
+    <input type="date" id={codice}></input>
+  )
 }
 
 function PrenotazioniGiornaliere(params) {
