@@ -154,7 +154,6 @@ function PaginaAdmin(props) {
         </form>
       </nav>
       <div className="bodyPrincipale">{props.body}</div>
-      <footer>Footer</footer>
     </div>
   );
 }

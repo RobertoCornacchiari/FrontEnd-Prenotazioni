@@ -43,7 +43,6 @@ function Pagina(props) {
       <div className="bodyPrincipale">
         {props.body}
       </div>
-      <footer>Footer</footer>
     </div>
   );
 }
@@ -82,7 +81,7 @@ export function HomePage(params) {
                 <Card
                   nome="controlla"
                   titolo="Controlla"
-                  testo="Controlla, annulla o stampa la tua prenotazione"
+                  testo="Controlla o annulla la tua prenotazione"
                   contesto={params.contesto}
                   immagine={assets.controlla}
                 />
@@ -593,7 +592,7 @@ export function EsitoTampone(params) {
 function EsitoCheck() {
   if (esito == "pending")
   return (
-    <p style={{"color" : "black"}}>Positivo.</p>
+    <p style={{"color" : "black"}}>Pending.</p>
   );
   if (esito == "positivo")
     return (
@@ -603,5 +602,7 @@ function EsitoCheck() {
     return (
       <p style={{"color" : "white", "backgroundColor": "red"}}>Negativo.</p>
     );
-  
+  return(
+    <></>
+  )
 }

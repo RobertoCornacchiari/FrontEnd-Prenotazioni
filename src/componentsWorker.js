@@ -89,7 +89,6 @@ function PaginaOperatore(props) {
         </form>
       </nav>
       <div className="bodyPrincipale">{props.body}</div>
-      <footer>Footer</footer>
     </div>
   );
 }
@@ -246,9 +245,9 @@ function AggiungiEsito(params) {
                   Esito
                 </label>
                 <select id="Scelte">
-                    <option value="Pending">pending</option>
-                    <option value="Positivo">positivo</option>
-                    <option value="Negativo">negativo</option>
+                    <option value="pending">Pending</option>
+                    <option value="positivo">Positivo</option>
+                    <option value="negativo">Negativo</option>
                 </select>
                 <div id="descrizioneRipetiPassword" className="form-text">
                   Scegli l'esito del tampone.
