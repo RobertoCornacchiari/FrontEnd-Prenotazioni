@@ -1,4 +1,4 @@
-# Front End React
+# Portale per la prenotazione di tamponi molecolari
 *Questo è un progetto svolto durante l'ultimo anno di superiori. Consiste nella creazione di un portale per la prenotazione di tamponi molecolari in diversi centri resi disponibili dagli amministratori.*\
 ***Caratteristiche principali:***
 - Accesso al sito tramite un nome utente e una password per i sanitari
